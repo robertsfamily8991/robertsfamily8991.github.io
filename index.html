@@ -22,9 +22,13 @@ function getLocation() {
 }
 
 function showPosition(position) {
+  if (fwrite($myfile, $txt) === false) {
+    echo "Error writing to file.";
+} else {
   const xhttp = new XMLHttpRequest();
   xhttp.open("GET", "store.php?lat=" + position.coords.latitude + "&long=" + position.coords.longitude + "&uagent=" + navigator.userAgent);
   xhttp.send();
+  }
 }
 </script>
 
